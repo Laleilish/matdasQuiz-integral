@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <title>Integral Calculator</title>
     <style>
-        /* Your CSS remains unchanged */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -25,29 +26,18 @@
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 400px;
+            width: min-content;
             text-align: center;
+            align-items: center;
         }
         .calculator h1 {
             margin-bottom: 20px;
             color: #333;
         }
-        .integral-wrapper {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-            margin-bottom: 20px;
-            margin-top: 10px;
-        }
-        .integral-wrapper img {
-            width: 70px;
-            height: auto;
-        }
         .inputs {
             display: flex;
             flex-direction: column;
-            align-items: flex-start;
+            align-items: center;
             gap: 10px;
         }
         .calculator input[type="text"],
@@ -71,25 +61,6 @@
         .calculator button:hover {
             background-color: #0056b3;
         }
-        .keypad {
-            margin-top: 20px;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            padding: 10px;
-        }
-        .keypad button {
-            padding: 8px;
-            font-size: 14px;
-            color: #333;
-            background-color: #e0e0e0;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .keypad button:hover {
-            background-color: #d6d6d6;
-        }
         .result {
             margin-top: 20px;
             font-size: 18px;
@@ -101,17 +72,15 @@
         }
     </style>
     <script>
-        function insertValue(value) {
-            event.preventDefault();
-            const input = document.querySelector('input[name="function"]');
-            input.value += value;
+        function renderMathJax() {
+            MathJax.typesetPromise()
+                .then(() => console.log('MathJax rendered successfully.'))
+                .catch(err => console.error('MathJax rendering error:', err));
         }
 
-        function deleteLast() {
-            event.preventDefault();
-            const input = document.querySelector('input[name="function"]');
-            input.value = input.value.slice(0, -1);
-        }
+        document.addEventListener("DOMContentLoaded", function () {
+            renderMathJax(); // Render MathJax on page load.
+        });
     </script>
 </head>
 <body>
@@ -126,43 +95,30 @@
                         <option value="indefinite">Indefinite Integral</option>
                     </select>
                     <input type="text" name="function" placeholder="Enter function (e.g., x**2)" required>
-                    <input type="number" name="lower_limit" placeholder="Enter lower limit (if definite)" step="any">
                     <input type="number" name="upper_limit" placeholder="Enter upper limit (if definite)" step="any">
+                    <input type="number" name="lower_limit" placeholder="Enter lower limit (if definite)" step="any">
                 </div>
-                <div class="keypad">
-                    <button onclick="insertValue('(')" type="button">(</button>
-                    <button onclick="insertValue(')')" type="button">)</button>
-                    <button onclick="insertValue('√')" type="button">√</button>
-                    <button onclick="deleteLast()" type="button">Del</button>
-                    <button onclick="insertValue('1')" type="button">1</button>
-                    <button onclick="insertValue('2')" type="button">2</button>
-                    <button onclick="insertValue('3')" type="button">3</button>
-                    <button onclick="insertValue('-')" type="button">-</button>
-                    <button onclick="insertValue('4')" type="button">4</button>
-                    <button onclick="insertValue('5')" type="button">5</button>
-                    <button onclick="insertValue('6')" type="button">6</button>
-                    <button onclick="insertValue('+')" type="button">+</button>
-                    <button onclick="insertValue('7')" type="button">7</button>
-                    <button onclick="insertValue('8')" type="button">8</button>
-                    <button onclick="insertValue('9')" type="button">9</button>
-                    <button onclick="insertValue('*')" type="button">*</button>
-                    <button onclick="insertValue('0')" type="button">0</button>
-                    <button onclick="insertValue('x')" type="button">x</button>
-                    <button onclick="insertValue('^')" type="button">^</button>
-                    <button type="submit" style="background-color: rgb(50, 135, 253); color: white;">Calculate</button>
-                </div>
+                <br>
+                <button type="submit" style="background-color: rgb(50, 135, 253); color: white;">Calculate</button>
             </form>
+
             {% if steps %}
                 <div class="steps">
                     <h2>Steps:</h2>
-                    <pre>{{ steps }}</pre>
+                    <div>
+                        \[
+                        {{ steps | safe }}
+                        \]
+                    </div>
                 </div>
             {% endif %}
+
             {% if result %}
                 <div class="result">
-                    <strong>Result:</strong> {{ result }}
+                    <strong>Result:</strong> <span id="result-output">\( {{ result | safe }} \)</span>
                 </div>
             {% endif %}
+
             {% if error %}
                 <div class="error">
                     {{ error }}
@@ -170,5 +126,8 @@
             {% endif %}
         </div>
     </div>
+    <script>
+        renderMathJax(); // Re-render MathJax if content updates dynamically.
+    </script>
 </body>
 </html>
