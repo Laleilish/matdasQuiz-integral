@@ -3,6 +3,7 @@
 <head>
     <title>Integral Calculator</title>
     <style>
+        /* Your CSS remains unchanged */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -101,11 +102,13 @@
     </style>
     <script>
         function insertValue(value) {
+            event.preventDefault();
             const input = document.querySelector('input[name="function"]');
             input.value += value;
         }
 
         function deleteLast() {
+            event.preventDefault();
             const input = document.querySelector('input[name="function"]');
             input.value = input.value.slice(0, -1);
         }
@@ -117,7 +120,6 @@
             <h1>Integral Calculator</h1>
             <form method="POST">
                 {% csrf_token %}
-
                 <div class="inputs">
                     <select name="integral_type" required>
                         <option value="definite">Definite Integral</option>
@@ -127,7 +129,6 @@
                     <input type="number" name="lower_limit" placeholder="Enter lower limit (if definite)" step="any">
                     <input type="number" name="upper_limit" placeholder="Enter upper limit (if definite)" step="any">
                 </div>
-
                 <div class="keypad">
                     <button onclick="insertValue('(')" type="button">(</button>
                     <button onclick="insertValue(')')" type="button">)</button>
@@ -151,20 +152,17 @@
                     <button type="submit" style="background-color: rgb(50, 135, 253); color: white;">Calculate</button>
                 </div>
             </form>
-            
             {% if steps %}
                 <div class="steps">
                     <h2>Steps:</h2>
                     <pre>{{ steps }}</pre>
                 </div>
             {% endif %}
-
             {% if result %}
                 <div class="result">
                     <strong>Result:</strong> {{ result }}
                 </div>
             {% endif %}
-
             {% if error %}
                 <div class="error">
                     {{ error }}
