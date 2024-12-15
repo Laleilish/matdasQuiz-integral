@@ -17,13 +17,14 @@ def calculate_integral(request):
             try:
                 # Step 1: Parse the function
                 expr = sympify(func)
-                steps.append(f"Langkah 1: Fungsi yang akan diintegralkan adalah: \\( {latex(expr)} \\)")
+                steps.append(f"Fungsi yang akan diintegralkan: \\( {latex(expr)} \\)")
 
                 if integral_type == "definite":
                     try:
                         # Step 2: Parse and validate limits
                         lower_limit = float(request.POST.get("lower_limit", 0))
                         upper_limit = float(request.POST.get("upper_limit", 0))
+                        steps.append("aturan :\( \int x^n \, dx = (\\frac{x^{n+1}}{n+1} + C \), untuk \( n \\neq -1 \))")
                         steps.append(f"Langkah 2: Batas integral adalah: "
                                      f"\\( \\text{{Batas bawah}} = {lower_limit}, \\text{{Batas atas}} = {upper_limit} \\)")
 
@@ -36,7 +37,7 @@ def calculate_integral(request):
                         upper_eval = round(float(indefinite_integral.subs(x, upper_limit)), 2)
                         lower_eval = round(float(indefinite_integral.subs(x, lower_limit)), 2)
                         steps.append(f"Langkah 4: Evaluasi hasil integral pada batas atas ({upper_limit}): "
-                                     f"\\( {latex(indefinite_integral)} \\big|_{{x={upper_limit}}} = {upper_eval} \\)")
+                                     f"\\( {latex(indefinite_integral)} \\big|^{{x={upper_limit}}} = {upper_eval} \\)")
                         steps.append(f"Langkah 5: Evaluasi hasil integral pada batas bawah ({lower_limit}): "
                                      f"\\( {latex(indefinite_integral)} \\big|_{{x={lower_limit}}} = {lower_eval} \\)")
 
@@ -52,10 +53,12 @@ def calculate_integral(request):
 
                 elif integral_type == "indefinite":
                     try:
+                        steps.append("Aturan: \( \int x^n \, dx = (\\frac{x^{n+1}}{n+1} + C \), untuk \( n \\neq -1 \))")
+
                         # Step 2: Compute the indefinite integral
                         indefinite_integral = integrate(expr, x)
                         result = f"{latex(indefinite_integral)} + C"
-                        steps.append(f"Langkah 2: Integral tak tentu dari fungsi ini adalah: "
+                        steps.append(f"Langkah 1: Integral tak tentu dari fungsi ini adalah: "
                                      f"\\( \\int {latex(expr)} \\, dx = {latex(indefinite_integral)} + C \\)")
 
                     except Exception as e:
