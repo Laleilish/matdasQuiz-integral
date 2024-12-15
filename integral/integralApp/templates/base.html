@@ -40,14 +40,43 @@
             align-items: center;
             gap: 10px;
         }
-        .calculator input[type="text"],
-        .calculator input[type="number"],
-        .calculator select {
+        .integral-container {
+            display: flex;
+            position: relative;
+            align-items: center;
+            justify-content: center;
+            height: 120px;
+        }
+        .integral-symbol {
+            width: 50px;
+            height: auto;
+        }
+        .upper-limit,
+        .lower-limit {
+            position: absolute;
+            width: 30px; /* Smaller width for limits */
+            font-size: 10px; /* Adjust font size */
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 5px;
+        }
+        .upper-limit {
+            top: 5px; /* Position above the symbol */
+            left: 55px; /* Slightly offset to the left */
+        }
+        .lower-limit {
+            bottom: 5px; /* Position below the symbol */
+            left: 54px; /* Slightly offset to the left */
+        }
+        .function-input {
+            margin-left: 10px; /* Slightly spaced from the symbol */
             padding: 10px;
             font-size: 16px;
             border: 1px solid #ccc;
             border-radius: 5px;
-            width: 250px;
+            width: 200px; /* Wider input for the function */
+            text-align: left;
         }
         .calculator button {
             padding: 10px;
@@ -70,8 +99,52 @@
             color: red;
             font-size: 14px;
         }
+        ul{
+            list-style: none;
+        }
+
+        select[name="integral_type"] {
+            padding: 10px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #007BFF; /* Match the button color */
+            border: none; /* Remove default border */
+            border-radius: 5px; /* Match button border radius */
+            cursor: pointer; /* Change cursor to pointer */
+            width: 220px; /* Set a width for consistency */
+            margin-bottom: 10px; /* Add some space below */
+            position: relative; /* Position relative for the pseudo-element */
+        }
+    
+        select[name="integral_type"]::after {
+            content: ''; /* Empty content for the arrow */
+            position: absolute;
+            right: 10px; /* Position the arrow */
+            top: 50%; /* Center vertically */
+            transform: translateY(-50%); /* Adjust for vertical centering */
+            border: solid white; /* Arrow color */
+            border-width: 0 2px 2px 0; /* Arrow shape */
+            display: inline-block;
+            padding: 3px;
+            transform: rotate(45deg); /* Rotate to create the arrow */
+            pointer-events: none; /* Prevent interaction with the arrow */
+        }
     </style>
     <script>
+        function toggleLimits() {
+            const integralType = document.querySelector('select[name="integral_type"]').value;
+            const upperLimit = document.querySelector('.upper-limit');
+            const lowerLimit = document.querySelector('.lower-limit');
+
+            if (integralType === 'indefinite') {
+                upperLimit.style.display = 'none';
+                lowerLimit.style.display = 'none';
+            } else {
+                upperLimit.style.display = 'block';
+                lowerLimit.style.display = 'block';
+            }
+        }
+
         function renderMathJax() {
             MathJax.typesetPromise()
                 .then(() => console.log('MathJax rendered successfully.'))
@@ -79,7 +152,11 @@
         }
 
         document.addEventListener("DOMContentLoaded", function () {
-            renderMathJax(); // Render MathJax on page load.
+            const integralTypeSelect = document.querySelector('select[name="integral_type"]');
+            integralTypeSelect.addEventListener('change', toggleLimits);
+
+            toggleLimits(); // Set initial visibility on page load
+            renderMathJax(); // Render MathJax on page load
         });
     </script>
 </head>
@@ -94,9 +171,12 @@
                         <option value="definite">Definite Integral</option>
                         <option value="indefinite">Indefinite Integral</option>
                     </select>
-                    <input type="text" name="function" placeholder="Enter function (e.g., x**2)" required>
-                    <input type="number" name="upper_limit" placeholder="Enter upper limit (if definite)" step="any">
-                    <input type="number" name="lower_limit" placeholder="Enter lower limit (if definite)" step="any">
+                    <div class="integral-container">
+                        <img src="https://i.imgur.com/7TrL2i8.png" alt="Integral Symbol" class="integral-symbol">
+                        <input type="number" name="upper_limit" class="upper-limit" step="any">
+                        <input type="number" name="lower_limit" class="lower-limit" step="any">
+                        <input type="text" name="function" placeholder="Masukkan fungsi (e.g., x**2)" class="function-input" required>
+                    </div>
                 </div>
                 <br>
                 <button type="submit" style="background-color: rgb(50, 135, 253); color: white;">Calculate</button>
@@ -105,11 +185,11 @@
             {% if steps %}
                 <div class="steps">
                     <h2>Steps:</h2>
-                    <div>
-                        \[
-                        {{ steps | safe }}
-                        \]
-                    </div>
+                    <ul>
+                        {% for step in steps %}
+                            <li>\[ {{ step | safe }} \]</li>
+                        {% endfor %}
+                    </ul>
                 </div>
             {% endif %}
 
